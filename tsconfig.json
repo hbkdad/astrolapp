@@ -1,0 +1,22 @@
+{
+  // Single project covering every source and test file. Used by `pnpm typecheck`,
+  // by ESLint's type-aware rules, and by editors — so tests are type-checked to
+  // the same standard as the engines they verify.
+  //
+  // Emitting is a separate concern: `pnpm build` uses tsconfig.build.json, which
+  // excludes tests.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "types": ["node"],
+    "paths": {
+      "@astrolapp/shared": ["./packages/shared/src/index.ts"],
+      "@astrolapp/astro-engine": ["./packages/astro-engine/src/index.ts"],
+      "@astrolapp/numerology-engine": ["./packages/numerology-engine/src/index.ts"]
+    }
+  },
+  "include": ["packages/*/src/**/*.ts", "*.config.ts", "*.config.js"]
+}

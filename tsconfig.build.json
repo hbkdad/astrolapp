@@ -1,0 +1,10 @@
+{
+  // Emit-only project graph. Kept separate from tsconfig.json so that test files
+  // are type-checked but never compiled into the published output.
+  "files": [],
+  "references": [
+    { "path": "./packages/shared/tsconfig.build.json" },
+    { "path": "./packages/astro-engine/tsconfig.build.json" },
+    { "path": "./packages/numerology-engine/tsconfig.build.json" }
+  ]
+}
