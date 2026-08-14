@@ -58,9 +58,10 @@ mechanical content-safety enforcement across all user-facing text.
 
 - Next.js 15 App Router, Tailwind, server-rendered. **All calculation happens on
   the server** — the browser never receives an ephemeris.
-- **Today**: overall score, seven category scores each with number + written band
-  - explanation, moon panel, numerology, transit cards showing calculated fact
-    and traditional interpretation as separately labelled fields.
+- **Today**: overall score, plus seven category scores that each carry a number,
+  a written band and an explanation. Moon panel, numerology, and transit cards
+  showing the calculated fact and the traditional interpretation as separately
+  labelled fields.
 - **My Chart**: SVG wheel (signs, houses, planets, aspect lines, ASC/MC) with a
   full text-equivalent table. The drawing is `aria-hidden`; the table is the
   accessible reading, not a fallback.
