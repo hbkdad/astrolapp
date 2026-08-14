@@ -15,12 +15,15 @@
 
 BEGIN;
 
--- A role that does NOT bypass RLS. The superuser does, so testing as postgres
+-- The `authenticated` and `anon` roles come from the auth stub and mirror
+-- Supabase. Neither bypasses RLS; the superuser does, so testing as postgres
 -- would pass no matter how broken the policies were.
-CREATE ROLE app_user NOLOGIN;
-GRANT USAGE ON SCHEMA public TO app_user;
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO app_user;
-GRANT USAGE ON SCHEMA auth TO app_user;
+--
+-- Table privileges are granted here because RLS filters rows but GRANT decides
+-- whether the role may touch the table at all. Without these, every query would
+-- fail on privilege rather than on policy, and the test would prove nothing.
+GRANT USAGE ON SCHEMA public TO authenticated, anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO authenticated, anon;
 
 -- Two users with birth data and a derived chart each.
 INSERT INTO users (id, email) VALUES
@@ -75,8 +78,8 @@ END $$;
 -- ---------------------------------------------------------------------------
 -- Isolation: acting as Alice, Bob's rows must be invisible.
 -- ---------------------------------------------------------------------------
-SET LOCAL ROLE app_user;
-SET LOCAL request.jwt.claim.sub = '11111111-1111-1111-1111-111111111111';
+SET LOCAL ROLE authenticated;
+SET LOCAL request.jwt.claims = '{"sub":"11111111-1111-1111-1111-111111111111"}';
 
 DO $$
 DECLARE
@@ -102,6 +105,12 @@ BEGIN
   SELECT count(*) INTO visible FROM birth_charts WHERE cache_key = 'chart:bob';
   IF visible <> 0 THEN
     RAISE EXCEPTION 'Alice can read Bob''s computed chart';
+  END IF;
+
+  -- RLS on with no policy means default-deny for every client-facing role.
+  SELECT count(*) INTO visible FROM processed_webhook_events;
+  IF visible <> 0 THEN
+    RAISE EXCEPTION 'a client can read the webhook ledger';
   END IF;
 END $$;
 
@@ -139,7 +148,29 @@ EXCEPTION
 END $$;
 
 RESET ROLE;
-RESET request.jwt.claim.sub;
+
+-- ---------------------------------------------------------------------------
+-- Anonymous visitors must see nothing. Every policy is granted TO authenticated,
+-- so anon falls through to default-deny.
+-- ---------------------------------------------------------------------------
+SET LOCAL ROLE anon;
+SET LOCAL request.jwt.claims = '{"role":"anon"}';
+
+DO $$
+DECLARE visible int;
+BEGIN
+  SELECT count(*) INTO visible FROM birth_profiles;
+  IF visible <> 0 THEN RAISE EXCEPTION 'anon can read % birth profiles', visible; END IF;
+
+  SELECT count(*) INTO visible FROM birth_charts;
+  IF visible <> 0 THEN RAISE EXCEPTION 'anon can read % birth charts', visible; END IF;
+
+  SELECT count(*) INTO visible FROM users;
+  IF visible <> 0 THEN RAISE EXCEPTION 'anon can read % users', visible; END IF;
+END $$;
+
+RESET ROLE;
+RESET request.jwt.claims;
 
 -- ---------------------------------------------------------------------------
 -- Constraints must reject the states they were written for.

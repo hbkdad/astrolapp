@@ -121,6 +121,9 @@ function main(): void {
     console.log('Applying 0002_row_level_security.sql…');
     runSqlFile(join(MIGRATIONS, '0002_row_level_security.sql'), '0002.sql');
 
+    console.log('Applying 0003_platform_hardening.sql…');
+    runSqlFile(join(MIGRATIONS, '0003_platform_hardening.sql'), '0003.sql');
+
     console.log('Verifying behaviour…');
     const output = runSqlFile(join(SCRIPTS, 'verify-schema.sql'), 'verify.sql');
 
@@ -130,10 +133,11 @@ function main(): void {
     }
 
     console.log('\nSchema verification passed:');
-    console.log('  - both migrations apply cleanly');
+    console.log('  - all migrations apply cleanly');
     console.log('  - RLS is enabled on every user-data table');
     console.log("  - one user cannot read another user's birth data or derived charts");
     console.log('  - a client cannot alter its own subscription or forge a chart');
+    console.log('  - anonymous visitors can read nothing at all');
     console.log('  - constraints and cascade deletes behave as written');
   } finally {
     removeContainer();

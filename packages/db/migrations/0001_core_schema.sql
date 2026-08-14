@@ -16,11 +16,18 @@
 
 BEGIN;
 
--- gen_random_uuid() for primary keys.
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+-- Extensions live outside `public` so their functions are not exposed through
+-- an auto-generated REST surface and cannot collide with application objects.
+-- Supabase already has this schema and puts it on the default search_path.
+CREATE SCHEMA IF NOT EXISTS extensions;
+
 -- citext gives case-insensitive email comparison, so Alex@x.com and alex@x.com
--- cannot become two accounts.
-CREATE EXTENSION IF NOT EXISTS "citext";
+-- cannot become two accounts. Referenced schema-qualified below, so this works
+-- regardless of the caller's search_path.
+CREATE EXTENSION IF NOT EXISTS citext WITH SCHEMA extensions;
+
+-- Note: gen_random_uuid() is core PostgreSQL from version 13 onward, so no
+-- pgcrypto dependency is needed for the primary keys below.
 
 -- ---------------------------------------------------------------------------
 -- Identity
@@ -28,7 +35,7 @@ CREATE EXTENSION IF NOT EXISTS "citext";
 
 CREATE TABLE users (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  email         citext,
+  email         extensions.citext,
   created_at    timestamptz NOT NULL DEFAULT now(),
   updated_at    timestamptz NOT NULL DEFAULT now(),
   -- Soft-delete marker. Actual erasure is a scheduled job so that a mistaken

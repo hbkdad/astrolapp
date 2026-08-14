@@ -122,8 +122,34 @@ schema used `citext` for emails without ever running `CREATE EXTENSION citext`.
 Every table after `users` would have failed. That is the value of running SQL
 rather than reading it.
 
+## Deployed
+
+Applied to the Supabase project `astrolapp` (`lhbwcmfhbziqugzuomfz`,
+ca-central-1, PostgreSQL 17.6) and verified **on the live database**, not only
+locally:
+
+- All 13 tables report `relrowsecurity = true`.
+- Acting as `authenticated` with Alice's JWT claim: 1 profile and 1 chart
+  visible. As `service_role`, which bypasses RLS: 2 and 2. The gap is the proof
+  — had both returned the same number, the check would have been vacuous.
+- Acting as `anon`: zero rows from `birth_profiles`, `birth_charts` and `users`.
+- Test rows were removed afterwards; cascade deletes cleared the caches.
+
+Supabase's linter surfaced two warnings, both fixed in `0003` and by moving
+`citext`:
+
+- `citext` was installed in `public`, exposing its functions through the REST
+  surface. Moved to `extensions` and referenced schema-qualified. Verified after
+  the move that case-insensitive comparison and the unique index still hold.
+- `public.rls_auto_enable()` — a Supabase-provided event trigger, not ours — was
+  `SECURITY DEFINER` with EXECUTE granted to `anon`. Revoked. (Low practical
+  risk: an `event_trigger` function cannot be invoked over RPC. It is also why
+  our tables had RLS on before `0002` even ran.)
+
+The one remaining lint is INFO-level and intentional: `processed_webhook_events`
+has RLS enabled with no policy, which is default-deny for every client role.
+
 ## Not yet built
 
-No query layer, no ORM, no connection pooling and no seed data. The migrations
-have been verified against local PostgreSQL but not yet applied to a hosted
-Supabase project — see `PROJECT_STATUS.md`.
+No query layer, no ORM, no connection pooling and no seed data. Nothing in the
+application reads or writes the database yet — see `PROJECT_STATUS.md`.

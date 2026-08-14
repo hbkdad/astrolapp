@@ -8,9 +8,10 @@ There is now a **working application**. Enter birth details and you get a
 calculated natal chart, a personalised daily reading with explainable scores, and
 an interactive chart wheel — all from verified astronomy, with no AI required.
 
-The database schema is written and behaviour-verified against real PostgreSQL,
-but nothing is wired to it yet. Not built: persistence wiring, auth,
-subscriptions, notifications, SEO pages, compatibility and the timeline.
+The database schema is **deployed to Supabase** and its row-level security
+verified on the live instance, but nothing in the app reads or writes it yet.
+Not built: persistence wiring, auth, subscriptions, notifications, SEO pages,
+compatibility and the timeline.
 
 `pnpm verify` passes: lint, typecheck (packages **and** web), **284 tests**,
 package build and Next.js production build.
@@ -80,16 +81,22 @@ Portable PostgreSQL migrations, RLS policies, version-driven cache keys and a
 fail-closed entitlements model.
 
 **Verified against real PostgreSQL 17** via `pnpm verify:schema`, which asserts
-that RLS actually isolates users (including the derived cache tables), that a
-client cannot escalate its own plan or forge a chart, and that constraints and
-cascade deletes behave. Negative-controlled, so the checks are known to be
-capable of failing. Not yet applied to a hosted Supabase project.
+that RLS actually isolates users (including the derived cache tables), that
+anonymous visitors see nothing, that a client cannot escalate its own plan or
+forge a chart, and that constraints and cascade deletes behave.
+Negative-controlled — disabling RLS, weakening a policy to `USING (true)`, and
+granting anon a permissive policy each make the run fail.
+
+**Deployed to Supabase** (`astrolapp`, ca-central-1) and re-verified live: as
+`authenticated` one user sees 1 profile / 1 chart where `service_role` sees
+2 / 2, and `anon` sees nothing. Linter warnings resolved. See
+[DATA_MODEL.md](DATA_MODEL.md).
 
 ## Not started
 
-- **Persistence wiring.** The schema is verified but nothing reads or writes it;
-  no query layer exists. The app stores its profile in an HTTP-only cookie as an
-  explicit interim.
+- **Persistence wiring.** The schema is live but nothing reads or writes it; no
+  query layer, no Supabase client in the app. The app still stores its profile
+  in an HTTP-only cookie as an explicit interim.
 - **Auth.** No accounts, no sessions.
 - **Subscriptions.** Entitlement logic exists and is tested; no Stripe
   integration, no webhook handler.
@@ -111,9 +118,11 @@ capable of failing. Not yet applied to a hosted Supabase project.
    "mixed". That makes them _readable_, not _right_.
 6. **Only ~8 hand-written transit interpretations.** Everything else composes
    from themes — acceptable but recognisably templated.
-7. **The migrations run and are behaviour-verified locally**, but have not been
-   applied to a hosted Supabase project. Running them for the first time found a
-   real bug — `citext` was used without `CREATE EXTENSION` — now fixed.
+7. **Migrations are deployed and behaviour-verified**, locally and on Supabase.
+   Running them for real found two things reading them had not: `citext` was
+   used without `CREATE EXTENSION`, and the applied policies needed
+   `TO authenticated` scoping that the committed file lacked. Both fixed, and
+   the repo now reproduces production.
 8. **Birth data currently sits in a browser cookie.** Interim, documented at the
    top of `apps/web/src/lib/profile.ts` and disclosed in the UI.
 
@@ -134,8 +143,7 @@ written and the app already has a single seam (`apps/web/src/lib/profile.ts`)
 where cookie storage becomes a database lookup. Doing this gets birth data out of
 the browser and unlocks multiple profiles, saved reports and notifications.
 
-This is the point where Supabase authorization actually matters. Everything up to
-here has been local.
+Supabase is now connected and the schema is deployed, so this is unblocked.
 
 After that, in rough value order: public sun-sign horoscopes (SEO surface,
 reuses the context engine), the timeline (`findTransitWindow` already does the
