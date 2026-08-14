@@ -5,3 +5,5 @@ packages:
 # esbuild ships a prebuilt binary and needs its postinstall to run; vitest depends on it.
 allowBuilds:
   esbuild: true
+  # sharp is Next.js's image optimiser; it ships prebuilt binaries.
+  sharp: true

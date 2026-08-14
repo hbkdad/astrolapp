@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-ink text-parchment antialiased;
+  }
+
+  /* Visible focus is required, not optional. Never remove without replacing. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-brass-bright ring-offset-2 ring-offset-ink;
+  }
+}
+
+@layer components {
+  .panel {
+    @apply rounded-lg border border-ink-line bg-ink-soft p-5;
+  }
+
+  .eyebrow {
+    @apply text-xs font-medium uppercase tracking-widest text-parchment-faint;
+  }
+}
+
+/*
+ * Motion is decorative here, so it is removed entirely for users who ask for
+ * that. The orbital drift on the landing page conveys no information.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

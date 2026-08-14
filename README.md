@@ -6,17 +6,17 @@ The goal is not "a horoscope website". It is a reliable calculation platform tha
 happens to provide horoscope, astrology, lunar and numerology experiences. Every
 displayed result should be traceable, reproducible, explainable and testable.
 
-> **Current state:** the calculation and interpretation layers are built and
-> verified (263 tests). A complete daily reading works end to end today with no
-> AI and no database — run `pnpm demo` to see one. The web application,
-> persistence and subscription layers are not started. See
+> **Current state:** there is a working app (284 tests). Enter birth details and
+> you get a calculated natal chart, a personalised daily reading with explainable
+> scores, and an interactive chart wheel — no AI required. Persistence, auth,
+> subscriptions and SEO pages are not built. See
 > [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md) for an honest breakdown.
-
-## Quick start
 
 ```bash
 pnpm install
-pnpm verify
+pnpm dev      # run the app
+pnpm demo     # print a reading to the terminal
+pnpm verify   # lint, typecheck, tests, builds
 ```
 
 ## What exists today
@@ -84,6 +84,8 @@ the AI layer switched off.
 - `@astrolapp/context-engine` — category scoring, combined daily context
 - `@astrolapp/interpretation-engine` — facts, interpretations, deterministic
   readings, AI schema validation and claim screening
+- `@astrolapp/db` — schema migrations, version-driven cache keys, entitlements
+- `apps/web` — Next.js application; all calculation runs server-side
 
 ## Documentation
 
@@ -93,6 +95,7 @@ the AI layer switched off.
 - [docs/NUMEROLOGY_ENGINE.md](docs/NUMEROLOGY_ENGINE.md)
 - [docs/LUNAR_ENGINE.md](docs/LUNAR_ENGINE.md)
 - [docs/INTERPRETATION_ENGINE.md](docs/INTERPRETATION_ENGINE.md)
+- [docs/DATA_MODEL.md](docs/DATA_MODEL.md)
 - [docs/TESTING.md](docs/TESTING.md)
 - [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md)
 - ADRs: [ephemeris choice](docs/ADR/0001-ephemeris-provider.md) ·

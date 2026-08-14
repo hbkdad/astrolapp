@@ -4,113 +4,128 @@ Last updated: 2026-08-14
 
 ## Honest summary
 
-The **deterministic calculation and interpretation layers are built and
-verified**. A complete daily reading can be produced end to end, today, with no
-AI and no database. The web application, persistence, subscriptions,
-notifications and SEO pages are **not started**.
+There is now a **working application**. Enter birth details and you get a
+calculated natal chart, a personalised daily reading with explainable scores, and
+an interactive chart wheel — all from verified astronomy, with no AI required.
 
-`pnpm verify` passes: lint clean, typecheck clean, **263 tests passing**, build
-succeeds. `pnpm demo` prints a full reading.
+Not built: persistence (the schema exists but has never been run), auth,
+subscriptions, notifications, SEO pages, compatibility and the timeline.
+
+`pnpm verify` passes: lint, typecheck (packages **and** web), **284 tests**,
+package build and Next.js production build.
+
+```bash
+pnpm dev     # run the app
+pnpm demo    # print a reading to the terminal
+pnpm verify  # the full gate
+```
 
 ## Done
 
-### Phase 1 — Infrastructure and standards
+### Phase 1 — Infrastructure
 
-- pnpm workspace, TypeScript strict (`noUncheckedIndexedAccess`, no `any`)
-- ESLint type-aware strict rules, Prettier
-- Vitest with source-resolved workspace aliases
-- Split TS projects: one for typecheck/lint (includes tests), one for emit
-- `AGENTS.md`, architecture docs, three ADRs
+pnpm workspace; TypeScript strict with `noUncheckedIndexedAccess` and no `any`;
+type-aware ESLint; Prettier; Vitest; split TS projects (one for typecheck/lint
+including tests, one for emit); `AGENTS.md`; three ADRs.
 
 ### Phase 2 — Deterministic engines
 
-| Component                                      | State | Verification                                         |
-| ---------------------------------------------- | ----- | ---------------------------------------------------- |
-| Ephemeris abstraction (`EphemerisProvider`)    | Done  | Interface-level tests                                |
-| astronomy-engine provider                      | Done  | Frame locked to published equinoxes (<0.01°)         |
-| Zodiac                                         | Done  | Boundary sweep                                       |
-| Aspects (5 major + 5 minor, configurable orbs) | Done  | Orb limits, seam, applying/separating                |
-| Houses: Placidus, Whole Sign, Equal            | Done  | Independent horizon verification, 4 cities × 4 dates |
-| Local time → UTC resolution                    | Done  | DST gap and overlap cases                            |
-| Lunar engine                                   | Done  | Published lunations within 2 minutes                 |
-| Numerology (Pythagorean)                       | Done  | Hand-worked values, Unicode edge cases               |
+| Component                           | Verification                                                 |
+| ----------------------------------- | ------------------------------------------------------------ |
+| `EphemerisProvider` abstraction     | Interface-level tests                                        |
+| astronomy-engine provider           | Frame locked to published equinoxes (<0.01°)                 |
+| Zodiac                              | Boundary sweep at 0 / 29.999 / 30 / 359.999 / 360 / negative |
+| Aspects, configurable orbs          | Orb limits, 0/360 seam, applying/separating                  |
+| Houses: Placidus, Whole Sign, Equal | Independent horizon verification, 4 cities × 4 dates         |
+| Local time → UTC                    | DST gap and overlap                                          |
+| Lunar engine                        | Published lunations within 2 minutes                         |
+| Numerology (Pythagorean)            | Hand-worked values, Unicode edge cases                       |
 
 ### Phase 3 — Charts and transits
 
-- Natal charts with full reproducibility metadata — **done**
-- Transit engine with configurable weights and score decomposition — **done**
-- Exact-time / orb-window search (handles multiple retrograde passes) — **done**
+Natal charts with full reproducibility metadata; transit engine with
+decomposable scoring; exact-time and orb-window search handling multiple
+retrograde passes.
 
 ### Phase 5 — Context and interpretation
 
-| Component                                        | State | Verification                             |
-| ------------------------------------------------ | ----- | ---------------------------------------- |
-| Combined personal context engine (Goal 10)       | Done  | Determinism, contribution sums, spread   |
-| Category scoring with explanations               | Done  | Neutral-vs-empty, dynamic range over 1yr |
-| Interpretation engine, FACT/INTERPRETATION split | Done  | Separation and framing asserted          |
-| Deterministic daily reading (Goal 12, personal)  | Done  | Complete with AI switched off            |
-| AI layer: schema validation + claim screening    | Done  | Fabrication and overclaim rejection      |
-| Content safety enforcement                       | Done  | Scans all user-facing text               |
+Combined context engine; category scoring with per-contribution explanations and
+a dynamic-range guard; FACT/INTERPRETATION separation; complete deterministic
+daily reading; AI schema validation with fabrication and overclaim screening;
+mechanical content-safety enforcement across all user-facing text.
+
+### Phase 4 — Application
+
+- Next.js 15 App Router, Tailwind, server-rendered. **All calculation happens on
+  the server** — the browser never receives an ephemeris.
+- **Today**: overall score, seven category scores each with number + written band
+  - explanation, moon panel, numerology, transit cards showing calculated fact
+    and traditional interpretation as separately labelled fields.
+- **My Chart**: SVG wheel (signs, houses, planets, aspect lines, ASC/MC) with a
+  full text-equivalent table. The drawing is `aria-hidden`; the table is the
+  accessible reading, not a fallback.
+- **Profile**: validated form, server-side validation regardless of client
+  checks, per-field errors, `role="alert"` summary.
+- Data-quality warnings are prominent: unknown birth time, DST ambiguity, and
+  Placidus polar fallback are all disclosed rather than hidden.
+- Verified in a real browser: form → chart → reading, no console errors, no
+  horizontal overflow at 375 px.
+
+### Phase 7 partial — Schema
+
+Portable PostgreSQL migrations, RLS policies, version-driven cache keys and a
+fail-closed entitlements model. **Reviewed SQL, not verified SQL** — see below.
 
 ## Not started
 
-Nothing below is stubbed to look finished.
+- **Persistence wiring.** The schema has never been run against a live database.
+  The app stores its profile in an HTTP-only cookie as an explicit interim.
+- **Auth.** No accounts, no sessions.
+- **Subscriptions.** Entitlement logic exists and is tested; no Stripe
+  integration, no webhook handler.
+- **Notifications**, **SEO pages**, **compatibility/synastry**, **timeline**,
+  **public sun-sign horoscopes**.
+- **Caching layer.** Keys are designed and tested; nothing reads or writes them.
+- **E2E and visual regression tests.** The browser check above was manual.
+- **CI.** No pipeline; `pnpm verify` is run by hand.
 
-- **Public sun-sign horoscope mode** (Goal 12) — the personalised mode exists;
-  the 12-sign public variant does not
-- **Compatibility / synastry** (Goal 16)
-- **Timeline / event calendar** (Goal 15) — `findTransitWindow` provides the
-  underlying search, but no event feed is assembled
-- **Database** (Goal 2) — no schema, no migrations, no PostgreSQL
-- **Next.js application** (Goals 13–14) — dashboard, chart wheel, pages
-- **Auth, subscriptions, entitlements, notifications** (Goals 18–20)
-- **SEO pages, sitemap, structured data** (Goal 17)
-- **Caching, observability, deployment, CI** (Goals 21, 25)
-- **Integration, E2E and visual tests** — blocked on the application layer
+## Known gaps
 
-## Known gaps and deferred decisions
-
-1. **No Chiron, Lilith or asteroids.** Genuinely absent from `astronomy-engine`.
-   Requires a provider swap or supplementary data. See ADR 0001.
-2. **Lunar nodes are mean, not true.** The true node oscillates around the mean
-   by up to ~1.6°. An astrological convention choice, documented not implicit.
-3. **No moonrise/moonset/azimuth.** Straightforward via `SearchRiseSet`; not built.
-4. **Placidus throws inside the polar circles.** Deliberate. See ADR 0002.
-5. **Default house system is Placidus** — a placeholder, not a researched choice.
-6. **Scoring weights and affinities are editorial guesses.** Internally
-   consistent and plausible; no outcome data supports them. `VALENCE_SCALE` was
-   tuned for legibility, not accuracy — see below.
-7. **Only ~8 hand-written transit interpretations exist.** Everything else is
-   composed from themes. Composition reads acceptably but is recognisably
-   templated; `Interpretation.source` makes the coverage gap measurable.
-8. **Swiss Ephemeris licensing** checked and rejected for now (AGPL/LGPL).
+1. **No Chiron, Lilith or asteroids** — absent from `astronomy-engine`. ADR 0001.
+2. **Lunar nodes are mean, not true** (up to ~1.6° apart).
+3. **No moonrise/moonset/azimuth.**
+4. **Placidus throws inside the polar circles** — deliberate; the app catches it
+   and falls back to whole-sign with a visible notice. ADR 0002.
+5. **Scoring weights and affinities are editorial guesses.** `VALENCE_SCALE` was
+   tuned so scores spread legibly across ~25–75 rather than collapsing into
+   "mixed". That makes them _readable_, not _right_.
+6. **Only ~8 hand-written transit interpretations.** Everything else composes
+   from themes — acceptable but recognisably templated.
+7. **The migrations are unrun.** Expect to find at least one error the first time
+   they are applied.
+8. **Birth data currently sits in a browser cookie.** Interim, documented at the
+   top of `apps/web/src/lib/profile.ts` and disclosed in the UI.
 
 ## Decisions needing a human
 
-Product and commercial calls, not engineering ones:
-
-- Default house system (Placidus vs Whole Sign) — affects every chart shown
-- Whether to buy a Swiss Ephemeris commercial licence
-- True vs mean lunar node
-- Subscription tier pricing (deliberately unconfigured)
-- **Scoring calibration.** The current curve was chosen so scores spread
-  legibly across 25–75 rather than collapsing into "mixed". That makes the
-  numbers _readable_; it does not make them _right_. Real calibration would need
-  user feedback data the product does not yet collect.
-- How much hand-written interpretation copy to commission versus leaving to
-  composition
+- **Default house system** — Placidus is the current default. Reversible: it is
+  stored per chart and selectable in the form.
+- **Swiss Ephemeris commercial licence** — only if asteroids become a requirement.
+- **True vs mean lunar node.**
+- **Subscription pricing** — deliberately unconfigured.
+- **Scoring calibration** — needs user feedback data the product does not collect.
+- **How much interpretation copy to commission** versus leaving to composition.
 
 ## Suggested next step
 
-Two tracks, safe to run in parallel:
+**Auth plus persistence, together.** They are one piece of work: the schema is
+written and the app already has a single seam (`apps/web/src/lib/profile.ts`)
+where cookie storage becomes a database lookup. Doing this gets birth data out of
+the browser and unlocks multiple profiles, saved reports and notifications.
 
-1. **Database schema and persistence** (Goal 2). The entities are now fully
-   determined by the engine output types — `NatalChart`, `DailyContext`,
-   `NumerologyProfile` — so the schema can be written without guesswork. Cache
-   keys should include the engine versions already stamped on every result.
-2. **Next.js application** (Goals 13–14). The data contract the UI renders is now
-   fixed and demonstrable via `pnpm demo`, so the dashboard can be built against
-   a real shape rather than an imagined one.
+This is the point where Supabase authorization actually matters. Everything up to
+here has been local.
 
-The public sun-sign horoscope mode (Goal 12) is a smaller follow-on and mostly
-reuses the existing context engine with a generic chart per sign.
+After that, in rough value order: public sun-sign horoscopes (SEO surface,
+reuses the context engine), the timeline (`findTransitWindow` already does the
+hard part), then compatibility.

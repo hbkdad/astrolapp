@@ -80,6 +80,15 @@ export interface DailyReading {
   readonly metadata: DailyContext['metadata'];
 }
 
+/**
+ * Category keys are camelCase identifiers; user-facing text needs words.
+ *
+ * `personalGrowth` must never reach a reader as-is.
+ */
+export function humaniseCategory(category: Category): string {
+  return category.replace(/([A-Z])/g, ' $1').toLowerCase();
+}
+
 function explainCategory(score: CategoryScore): string {
   if (score.contributions.length === 0) {
     return `No transits currently contact the points associated with ${score.category}, so this sits at neutral.`;
@@ -120,7 +129,9 @@ function buildSummary(context: DailyContext, categories: readonly CategoryReadin
     );
   }
 
-  const parts = notable.map((category) => `${category.category} ${category.band}`);
+  const parts = notable.map(
+    (category) => `${humaniseCategory(category.category)} (${category.band})`,
+  );
   return `${overallSentence} The most active areas are ${parts.join(', ')}.`;
 }
 

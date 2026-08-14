@@ -9,6 +9,9 @@
   },
   "scripts": {
     "build": "tsc -b tsconfig.build.json",
+    "build:web": "pnpm --filter @astrolapp/web build",
+    "typecheck:web": "pnpm --filter @astrolapp/web typecheck",
+    "dev": "pnpm --filter @astrolapp/web dev",
     "typecheck": "tsc -p tsconfig.json --pretty",
     "test": "vitest run",
     "demo": "tsx tools/demo-reading.ts",
@@ -17,7 +20,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+    "verify": "pnpm lint && pnpm typecheck && pnpm typecheck:web && pnpm test && pnpm build && pnpm build:web"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

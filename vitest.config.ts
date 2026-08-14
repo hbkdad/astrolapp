@@ -17,6 +17,7 @@ export default defineConfig({
       '@astrolapp/numerology-engine': resolvePackage('numerology-engine'),
       '@astrolapp/context-engine': resolvePackage('context-engine'),
       '@astrolapp/interpretation-engine': resolvePackage('interpretation-engine'),
+      '@astrolapp/db': resolvePackage('db'),
     },
   },
   test: {

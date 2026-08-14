@@ -25,6 +25,7 @@ export {
   buildDailyReading,
   describeScore,
   describeConfidence,
+  humaniseCategory,
   READING_DISCLAIMER,
 } from './reading.js';
 export type { DailyReading, CategoryReading } from './reading.js';

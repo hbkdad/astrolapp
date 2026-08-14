@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "preserve",
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "incremental": true,
+    "plugins": [{ "name": "next" }],
+    "paths": {
+      "@/*": ["./src/*"],
+      "@astrolapp/shared": ["../../packages/shared/src/index.ts"],
+      "@astrolapp/astro-engine": ["../../packages/astro-engine/src/index.ts"],
+      "@astrolapp/numerology-engine": ["../../packages/numerology-engine/src/index.ts"],
+      "@astrolapp/context-engine": ["../../packages/context-engine/src/index.ts"],
+      "@astrolapp/interpretation-engine": ["../../packages/interpretation-engine/src/index.ts"],
+      "@astrolapp/db": ["../../packages/db/src/index.ts"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}

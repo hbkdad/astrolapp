@@ -17,7 +17,8 @@
       "@astrolapp/astro-engine": ["./packages/astro-engine/src/index.ts"],
       "@astrolapp/numerology-engine": ["./packages/numerology-engine/src/index.ts"],
       "@astrolapp/context-engine": ["./packages/context-engine/src/index.ts"],
-      "@astrolapp/interpretation-engine": ["./packages/interpretation-engine/src/index.ts"]
+      "@astrolapp/interpretation-engine": ["./packages/interpretation-engine/src/index.ts"],
+      "@astrolapp/db": ["./packages/db/src/index.ts"]
     }
   },
   "include": ["packages/*/src/**/*.ts", "tools/**/*.ts", "*.config.ts", "*.config.js"]

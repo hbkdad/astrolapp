@@ -3,7 +3,16 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['**/dist/**', '**/node_modules/**', '**/*.tsbuildinfo', 'coverage/**'],
+    ignores: [
+      '**/dist/**',
+      '**/node_modules/**',
+      '**/*.tsbuildinfo',
+      'coverage/**',
+      // The web app has its own TypeScript project (JSX, DOM libs, Next plugin)
+      // that the root project deliberately does not include. It is type-checked
+      // and built by its own scripts, which `pnpm verify` runs.
+      'apps/**',
+    ],
   },
   eslint.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
