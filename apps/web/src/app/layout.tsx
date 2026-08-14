@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import './globals.css';
+import { SITE_URL } from '@/lib/seo';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: 'Astrolapp — personal cosmic calendar',
     template: '%s · Astrolapp',
@@ -12,6 +14,8 @@ export const metadata: Metadata = {
 };
 
 const NAV_LINKS = [
+  { href: '/horoscope', label: 'Horoscopes' },
+  { href: '/moon-phase/today', label: 'Moon' },
   { href: '/today', label: 'Today' },
   { href: '/chart', label: 'My Chart' },
   { href: '/profile', label: 'Profile' },
@@ -57,7 +61,25 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </main>
 
         <footer className="mx-auto max-w-5xl px-4 py-10">
-          <p className="border-t border-ink-line pt-6 text-xs leading-relaxed text-parchment-faint">
+          <ul className="flex flex-wrap gap-x-5 gap-y-2 border-t border-ink-line pt-6 text-xs">
+            {[
+              { href: '/horoscope', label: 'Horoscopes' },
+              { href: '/moon-phase/today', label: 'Moon phase' },
+              { href: '/numerology/life-path/1', label: 'Numerology' },
+              { href: '/privacy', label: 'Privacy' },
+              { href: '/terms', label: 'Terms' },
+            ].map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className="text-parchment-muted underline-offset-4 hover:text-parchment hover:underline"
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-6 text-xs leading-relaxed text-parchment-faint">
             Astrology and numerology are interpretive traditions, not established science. The
             astronomical positions behind every reading are calculated and verifiable; the meanings
             drawn from them are traditional interpretations. Scores are product heuristics, not

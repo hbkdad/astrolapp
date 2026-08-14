@@ -13,7 +13,11 @@ verified on the live instance, but nothing in the app reads or writes it yet.
 Not built: persistence wiring, auth, subscriptions, notifications, SEO pages,
 compatibility and the timeline.
 
-`pnpm verify` passes: lint, typecheck (packages **and** web), **284 tests**,
+There is now also a **public, indexable surface**: 12 sign horoscopes, a live
+Moon page and 12 Life Path pages, all built from recomputed astronomy rather
+than pre-written copy.
+
+`pnpm verify` passes: lint, typecheck (packages **and** web), **303 tests**,
 package build and Next.js production build.
 
 ```bash
@@ -21,6 +25,7 @@ pnpm dev            # run the app
 pnpm demo           # print a reading to the terminal
 pnpm verify         # the full gate
 pnpm verify:schema  # migrations + RLS against real PostgreSQL (needs Docker)
+pnpm release-check  # deployment configuration gate (run before shipping)
 ```
 
 ## Done
@@ -92,6 +97,32 @@ granting anon a permissive policy each make the run fail.
 2 / 2, and `anon` sees nothing. Linter warnings resolved. See
 [DATA_MODEL.md](DATA_MODEL.md).
 
+### Phase 8 — Public surface and SEO
+
+- **12 sign horoscopes** at `/horoscope/[sign]`, statically generated and
+  revalidated hourly. Built on the traditional **solar-house convention**:
+  houses counted in whole signs from the reader's sign. Every claim is
+  checkable — "Venus is at 7°36' Libra, which is the 3rd sign from Leo, so the
+  3rd solar house". A test asserts the twelve readings differ materially, which
+  is what stops this becoming the thin content the brief prohibits.
+- **`/moon-phase/today`** — live phase, illumination, sign, age and the exact
+  next four lunation times. Revalidated every 15 minutes.
+- **12 Life Path pages**, each showing a _worked example_ whose reduction really
+  produces that number, found by search so the demonstration can never be wrong.
+- `sitemap.xml`, `robots.txt`, canonical URLs, Open Graph, and BreadcrumbList /
+  Article JSON-LD only where genuinely valid.
+- Personal routes are `noindex` **and** disallowed in robots — they render one
+  visitor's chart and have no business in an index.
+- **Privacy and Terms** pages describing what the software actually does.
+
+### Phase 9 partial — Release gating
+
+`pnpm release-check` fails the build on deployment misconfiguration that is
+invisible in development: an unset canonical host, a service-role key exposed
+via a `NEXT_PUBLIC_` variable, or missing legal pages. Separately, robots.txt
+disallows everything when the canonical host is still the localhost placeholder,
+so a misconfigured deploy cannot be indexed.
+
 ## Not started
 
 - **Persistence wiring.** The schema is live but nothing reads or writes it; no
@@ -100,8 +131,8 @@ granting anon a permissive policy each make the run fail.
 - **Auth.** No accounts, no sessions.
 - **Subscriptions.** Entitlement logic exists and is tested; no Stripe
   integration, no webhook handler.
-- **Notifications**, **SEO pages**, **compatibility/synastry**, **timeline**,
-  **public sun-sign horoscopes**.
+- **Notifications**, **compatibility/synastry**, **timeline**.
+- **Weekly and monthly** horoscopes — only the daily variant exists.
 - **Caching layer.** Keys are designed and tested; nothing reads or writes them.
 - **E2E and visual regression tests.** The browser check above was manual.
 - **CI.** No pipeline; `pnpm verify` is run by hand.

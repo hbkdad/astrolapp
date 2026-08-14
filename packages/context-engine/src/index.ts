@@ -19,3 +19,11 @@ export type {
   NumerologyContext,
   Signal,
 } from './context.js';
+
+export {
+  computeSolarSignContext,
+  computeAllSolarSignContexts,
+  solarHouseOf,
+  referenceInstantFor,
+} from './solar.js';
+export type { SolarSignContext, SolarPlacement, SkyAspect } from './solar.js';

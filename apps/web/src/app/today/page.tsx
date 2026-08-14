@@ -5,7 +5,9 @@ import { computeForProfile } from '@/lib/engine';
 import { ScoreBar } from '@/components/ScoreBar';
 import { InterpretationCard } from '@/components/InterpretationCard';
 
-export const metadata: Metadata = { title: 'Today' };
+// Personal pages render one visitor's own chart. `noindex` keeps them out
+// of search results even if a link leaks; robots.ts disallows them too.
+export const metadata: Metadata = { title: 'Today', robots: { index: false, follow: false } };
 
 // Positions change continuously, so this page is always computed fresh.
 export const dynamic = 'force-dynamic';

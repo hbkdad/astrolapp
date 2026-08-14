@@ -16,6 +16,7 @@
     "test": "vitest run",
     "demo": "tsx tools/demo-reading.ts",
     "verify:schema": "tsx tools/verify-schema.ts",
+    "release-check": "tsx tools/release-check.ts",
     "test:watch": "vitest",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

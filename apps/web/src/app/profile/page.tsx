@@ -3,7 +3,11 @@ import { readProfile } from '@/lib/profile';
 import { ProfileForm } from './ProfileForm';
 import { clearProfileAction } from './actions';
 
-export const metadata: Metadata = { title: 'Birth profile' };
+// Collects personal data; never indexed.
+export const metadata: Metadata = {
+  title: 'Birth profile',
+  robots: { index: false, follow: false },
+};
 
 export default async function ProfilePage() {
   const existing = await readProfile();

@@ -5,7 +5,9 @@ import { readProfile } from '@/lib/profile';
 import { computeForProfile } from '@/lib/engine';
 import { ChartWheel } from '@/components/ChartWheel';
 
-export const metadata: Metadata = { title: 'My chart' };
+// Personal pages render one visitor's own chart. `noindex` keeps them out
+// of search results even if a link leaks; robots.ts disallows them too.
+export const metadata: Metadata = { title: 'My chart', robots: { index: false, follow: false } };
 export const dynamic = 'force-dynamic';
 
 export default async function ChartPage() {

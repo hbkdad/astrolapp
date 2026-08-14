@@ -39,3 +39,8 @@ export {
   resolveReading,
 } from './ai.js';
 export type { AiReading, AiReadingInput, AiValidationResult } from './ai.js';
+
+export { buildPublicHoroscope } from './public-reading.js';
+export type { PublicHoroscope, PublicHighlight } from './public-reading.js';
+export { SOLAR_HOUSE_THEMES, solarHouseTheme } from './content/solar-houses.js';
+export type { SolarHouseTheme } from './content/solar-houses.js';
