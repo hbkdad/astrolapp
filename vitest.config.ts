@@ -15,6 +15,8 @@ export default defineConfig({
       '@astrolapp/shared': resolvePackage('shared'),
       '@astrolapp/astro-engine': resolvePackage('astro-engine'),
       '@astrolapp/numerology-engine': resolvePackage('numerology-engine'),
+      '@astrolapp/context-engine': resolvePackage('context-engine'),
+      '@astrolapp/interpretation-engine': resolvePackage('interpretation-engine'),
     },
   },
   test: {

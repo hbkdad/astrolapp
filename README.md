@@ -6,8 +6,10 @@ The goal is not "a horoscope website". It is a reliable calculation platform tha
 happens to provide horoscope, astrology, lunar and numerology experiences. Every
 displayed result should be traceable, reproducible, explainable and testable.
 
-> **Current state:** the deterministic engines are built and verified (202 tests).
-> The web application, database and subscription layers are not started. See
+> **Current state:** the calculation and interpretation layers are built and
+> verified (263 tests). A complete daily reading works end to end today with no
+> AI and no database — run `pnpm demo` to see one. The web application,
+> persistence and subscription layers are not started. See
 > [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md) for an honest breakdown.
 
 ## Quick start
@@ -79,6 +81,9 @@ the AI layer switched off.
 - `@astrolapp/astro-engine` — ephemeris, zodiac, aspects, houses, time, natal,
   transits, lunar
 - `@astrolapp/numerology-engine` — normalization, reduction, Pythagorean system
+- `@astrolapp/context-engine` — category scoring, combined daily context
+- `@astrolapp/interpretation-engine` — facts, interpretations, deterministic
+  readings, AI schema validation and claim screening
 
 ## Documentation
 
@@ -87,6 +92,7 @@ the AI layer switched off.
 - [docs/ASTROLOGY_ENGINE.md](docs/ASTROLOGY_ENGINE.md)
 - [docs/NUMEROLOGY_ENGINE.md](docs/NUMEROLOGY_ENGINE.md)
 - [docs/LUNAR_ENGINE.md](docs/LUNAR_ENGINE.md)
+- [docs/INTERPRETATION_ENGINE.md](docs/INTERPRETATION_ENGINE.md)
 - [docs/TESTING.md](docs/TESTING.md)
 - [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md)
 - ADRs: [ephemeris choice](docs/ADR/0001-ephemeris-provider.md) ·

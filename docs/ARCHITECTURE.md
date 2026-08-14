@@ -46,8 +46,13 @@ enhancement, not a dependency.
 | `@astrolapp/astro-engine`      | Ephemeris access, zodiac, aspects, houses, time resolution, natal charts, transits, lunar | `shared`, `astronomy-engine` |
 | `@astrolapp/numerology-engine` | Name normalization, reduction, Pythagorean system                                         | `shared`                     |
 
-Planned but not yet built: `interpretation-engine`, `db`, and the Next.js app.
-See `PROJECT_STATUS.md` for the honest state of each.
+Since added: `@astrolapp/context-engine` (category scoring and the combined daily
+context, Goal 10) and `@astrolapp/interpretation-engine` (facts, interpretations,
+deterministic readings and AI validation, Goal 11). Both are documented in
+[INTERPRETATION_ENGINE.md](INTERPRETATION_ENGINE.md).
+
+Planned but not yet built: `db` and the Next.js app. See `PROJECT_STATUS.md` for
+the honest state of each.
 
 ## Why angle arithmetic is centralised
 

@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "tsBuildInfoFile": "./dist/.tsbuildinfo"
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.test.ts"],
+  "references": [
+    { "path": "../shared/tsconfig.build.json" },
+    { "path": "../astro-engine/tsconfig.build.json" },
+    { "path": "../numerology-engine/tsconfig.build.json" },
+    { "path": "../context-engine/tsconfig.build.json" }
+  ]
+}
