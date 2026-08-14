@@ -15,6 +15,7 @@
     "typecheck": "tsc -p tsconfig.json --pretty",
     "test": "vitest run",
     "demo": "tsx tools/demo-reading.ts",
+    "verify:schema": "tsx tools/verify-schema.ts",
     "test:watch": "vitest",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

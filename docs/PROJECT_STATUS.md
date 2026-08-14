@@ -8,16 +8,18 @@ There is now a **working application**. Enter birth details and you get a
 calculated natal chart, a personalised daily reading with explainable scores, and
 an interactive chart wheel — all from verified astronomy, with no AI required.
 
-Not built: persistence (the schema exists but has never been run), auth,
+The database schema is written and behaviour-verified against real PostgreSQL,
+but nothing is wired to it yet. Not built: persistence wiring, auth,
 subscriptions, notifications, SEO pages, compatibility and the timeline.
 
 `pnpm verify` passes: lint, typecheck (packages **and** web), **284 tests**,
 package build and Next.js production build.
 
 ```bash
-pnpm dev     # run the app
-pnpm demo    # print a reading to the terminal
-pnpm verify  # the full gate
+pnpm dev            # run the app
+pnpm demo           # print a reading to the terminal
+pnpm verify         # the full gate
+pnpm verify:schema  # migrations + RLS against real PostgreSQL (needs Docker)
 ```
 
 ## Done
@@ -75,12 +77,19 @@ mechanical content-safety enforcement across all user-facing text.
 ### Phase 7 partial — Schema
 
 Portable PostgreSQL migrations, RLS policies, version-driven cache keys and a
-fail-closed entitlements model. **Reviewed SQL, not verified SQL** — see below.
+fail-closed entitlements model.
+
+**Verified against real PostgreSQL 17** via `pnpm verify:schema`, which asserts
+that RLS actually isolates users (including the derived cache tables), that a
+client cannot escalate its own plan or forge a chart, and that constraints and
+cascade deletes behave. Negative-controlled, so the checks are known to be
+capable of failing. Not yet applied to a hosted Supabase project.
 
 ## Not started
 
-- **Persistence wiring.** The schema has never been run against a live database.
-  The app stores its profile in an HTTP-only cookie as an explicit interim.
+- **Persistence wiring.** The schema is verified but nothing reads or writes it;
+  no query layer exists. The app stores its profile in an HTTP-only cookie as an
+  explicit interim.
 - **Auth.** No accounts, no sessions.
 - **Subscriptions.** Entitlement logic exists and is tested; no Stripe
   integration, no webhook handler.
@@ -102,8 +111,9 @@ fail-closed entitlements model. **Reviewed SQL, not verified SQL** — see below
    "mixed". That makes them _readable_, not _right_.
 6. **Only ~8 hand-written transit interpretations.** Everything else composes
    from themes — acceptable but recognisably templated.
-7. **The migrations are unrun.** Expect to find at least one error the first time
-   they are applied.
+7. **The migrations run and are behaviour-verified locally**, but have not been
+   applied to a hosted Supabase project. Running them for the first time found a
+   real bug — `citext` was used without `CREATE EXTENSION` — now fixed.
 8. **Birth data currently sits in a browser cookie.** Interim, documented at the
    top of `apps/web/src/lib/profile.ts` and disclosed in the UI.
 

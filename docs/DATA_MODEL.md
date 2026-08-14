@@ -93,8 +93,37 @@ event_id)`. Insert the event id in the **same transaction** that applies the
 effect and let the primary key reject replays. Payment providers redeliver
 events routinely; processing one twice must not double-apply.
 
+## Verification
+
+```bash
+pnpm verify:schema
+```
+
+Spins up a throwaway PostgreSQL 17 container — the major version Supabase
+runs — applies both migrations plus a stub `auth.uid()`, and then asserts
+behaviour rather than mere syntax:
+
+- RLS is enabled on every table holding user data.
+- Acting as a non-superuser role, one user cannot read another's birth profile
+  **or** their derived charts. Testing as `postgres` would pass no matter how
+  broken the policies were, because superusers bypass RLS.
+- A client cannot alter its own subscription plan or insert a fabricated chart.
+- Constraints fire: incoherent birth-time state, out-of-range coordinates, a
+  public report with no share token, a report comparing someone with themselves,
+  duplicate primary profiles, and webhook replay.
+- Deleting a user cascades to birth data and every derived cache.
+
+The assertions were negative-controlled: disabling RLS on `birth_charts`, and
+separately weakening its policy to `USING (true)`, both make the run fail. A
+check that cannot fail proves nothing.
+
+Applying the migrations for the first time immediately found a real bug: the
+schema used `citext` for emails without ever running `CREATE EXTENSION citext`.
+Every table after `users` would have failed. That is the value of running SQL
+rather than reading it.
+
 ## Not yet built
 
-No query layer, no ORM, no connection pooling, no seed data, and the migrations
-have not been run against a live database. They are reviewed SQL, not verified
-SQL — see `PROJECT_STATUS.md`.
+No query layer, no ORM, no connection pooling and no seed data. The migrations
+have been verified against local PostgreSQL but not yet applied to a hosted
+Supabase project — see `PROJECT_STATUS.md`.

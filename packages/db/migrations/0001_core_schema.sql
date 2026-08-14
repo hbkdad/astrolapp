@@ -16,7 +16,11 @@
 
 BEGIN;
 
+-- gen_random_uuid() for primary keys.
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+-- citext gives case-insensitive email comparison, so Alex@x.com and alex@x.com
+-- cannot become two accounts.
+CREATE EXTENSION IF NOT EXISTS "citext";
 
 -- ---------------------------------------------------------------------------
 -- Identity
